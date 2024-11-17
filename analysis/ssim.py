@@ -28,7 +28,7 @@ image_fake_out_gray = cv2.cvtColor(image_fake_out, cv2.COLOR_BGR2GRAY)
 
 # Window size
 image_size = (256, 256)
-window_size = (256, 256)
+window_size = (11, 11) # (11, 11) is what the people are saying
 
 slide_x = 0
 slide_y = 0
