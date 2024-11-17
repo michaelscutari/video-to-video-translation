@@ -8,6 +8,12 @@ import matplotlib.pyplot as plt
 # 1 is perfect similarity
 # 0 is no similarity
 
+# TODO:: Generate 100 images from each of the following:
+# generated from pix2pix, generated from CycleGAN, and one ground truth from the test set
+# TODO:: Implement the sliding window/ average SSIM metric
+# TODO:: plot/display results for 100 images
+# CycleGAN trained on unpaired data sets
+
 # Three images are real_pair (real_in, real_out) and fake_out
 image_real_out_path = 'data/frame_0_real.png'
 image_fake_out_path = 'data/frame_0_fake.png'
