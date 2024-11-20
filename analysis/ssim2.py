@@ -107,8 +107,8 @@ ssim, luminance, contrast, structure = ssim_score(image_real_out_path, image_fak
 ## TODO:: NEED TO INCLUDE FUNCTIONALITY ABOUT THE WINDOW SLIDING AND AVERAGING
 
 def evaluate_folder_ssim(folder_path, 
-                    WINDOW_SIZE=None,
-                    ALPHA_chosen=None,BETA_chosen=None, GAMMA_chosen=None,
+                    WINDOW_SIZE=(11,11),
+                    ALPHA_chosen=1,BETA_chosen=1, GAMMA_chosen=1,
                     plotAll=False,
                     plotScores=False):
 
@@ -136,14 +136,14 @@ def evaluate_folder_ssim(folder_path,
     for i in range(len(real_images)):
         image_number = real_images[i].split('_')[0]
 
-        ssim_scores_pix2pix.append(ssim2.ssim_score(os.path.join(folder_path, real_images[i]), 
+        ssim_scores_pix2pix.append(ssim_score(os.path.join(folder_path, real_images[i]), 
                                                     os.path.join(folder_path, pix2pix_images[i]),
                                                     WINDOW_SIZE=WINDOW_SIZE,
                                                     ALPHA_chosen=ALPHA_chosen, BETA_chosen=BETA_chosen, GAMMA_chosen=GAMMA_chosen,
                                                     plotOn=plotAll,
                                                     image_number=image_number,
                                                     generation_type='PIX'))
-        ssim_scores_cycle.append(ssim2.ssim_score(os.path.join(folder_path, real_images[i]),
+        ssim_scores_cycle.append(ssim_score(os.path.join(folder_path, real_images[i]),
                                                     os.path.join(folder_path, cycle_images[i]),
                                                     WINDOW_SIZE=WINDOW_SIZE,
                                                     ALPHA_chosen=ALPHA_chosen, BETA_chosen=BETA_chosen, GAMMA_chosen=GAMMA_chosen,
@@ -161,8 +161,8 @@ def evaluate_folder_ssim(folder_path,
 
 #### HOW TO USE ##################################################
 
-folder_path = 'cycle_pix_maps_compared'
+#folder_path = 'cycle_pix_maps_compared'
 
-ssim_scores_pix2pix, ssim_scores_cycle = evaluate_folder_ssim(folder_path, plotScores=True)
+#ssim_scores_pix2pix, ssim_scores_cycle = evaluate_folder_ssim(folder_path, plotScores=True)
 
 
