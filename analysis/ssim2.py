@@ -20,7 +20,9 @@ def ssim_score(image_real_out_path,
                SLIDE_X=0, SLIDE_Y=0,   #top-left corner of the window (pixel loc on overall image)
                L_chosen=255, k_1_chosen=0.01, k_2_chosen=0.03, 
                ALPHA_chosen=1, BETA_chosen=1, GAMMA_chosen=1, # emphasis of Luminance, Contrast, Structure
-               plotOn=False): 
+               plotOn=False,
+               image_number="WHICH IMAGE?", # fill out this if plot on
+               generation_type='PIX or CYC?'): # fill out this if plot on
     
     # Read the images
     image_real_out = cv2.imread(image_real_out_path)
@@ -75,10 +77,10 @@ def ssim_score(image_real_out_path,
         # Plot the images side by side
         plt.subplot(1, 2, 1)
         plt.imshow(window_real, cmap='gray')
-        plt.title('Real')
+        plt.title(f'Real | Image No. {image_number} ')
         plt.subplot(1, 2, 2)
         plt.imshow(window_fake, cmap='gray')
-        plt.title('Fake')
+        plt.title(f'Fake | {generation_type}')
 
         # add to the plot the SSIM value along with the luminance, contrast, and structure values
         plt.suptitle('SSIM: %.2f, Luminance: %.2f, Contrast: %.2f, Structure: %.2f' % (ssim, luminance, contrast, structure))
