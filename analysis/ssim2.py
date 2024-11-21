@@ -22,6 +22,7 @@ def ssim_score(image_real_out_path,
                L_chosen=255, k_1_chosen=0.01, k_2_chosen=0.03, 
                ALPHA_chosen=1, BETA_chosen=1, GAMMA_chosen=1, # emphasis of Luminance, Contrast, Structure
                plotOn=False,
+               printData=False,
                image_number="WHICH IMAGE?", # fill out this if plot on
                generation_type='PIX or CYC?'): # fill out this if plot on
     
@@ -87,8 +88,8 @@ def ssim_score(image_real_out_path,
         plt.suptitle('SSIM: %.2f, Luminance: %.2f, Contrast: %.2f, Structure: %.2f' % (ssim, luminance, contrast, structure))
 
         plt.show()
-    else:
-        print('SSIM: %.2f, Luminance: %.2f, Contrast: %.2f, Structure: %.2f' % (ssim, luminance, contrast, structure))
+    if printData==True:
+        print(f'Image#{image_number}-{generation_type} ~ SSIM: {ssim:.2f}, Luminance: {luminance:.2f}, Contrast: {contrast:.2f}, Structure: {structure:.2f}')
 
     return ssim, luminance, contrast, structure
 
@@ -109,8 +110,11 @@ ssim, luminance, contrast, structure = ssim_score(image_real_out_path, image_fak
 def evaluate_folder_ssim(folder_path, 
                     WINDOW_SIZE=(11,11),
                     ALPHA_chosen=1,BETA_chosen=1, GAMMA_chosen=1,
+                    STRIDE_X=1, STRIDE_Y=1,   # stride of window 
                     plotAll=False,
-                    plotScores=False):
+                    plotSpecial=False,
+                    plotScores=False,
+                    printData=False):
 
     #### Designate Image Source
 
@@ -128,6 +132,7 @@ def evaluate_folder_ssim(folder_path,
 
     # find all images with a name containing 'ground_truth'
     ground_truth_images = [fileName for fileName in os.listdir(folder_path) if 'ground_truth' in fileName]
+    ground_truth_images.sort()
 
     ##### Get the SSIM scores for each image
     ssim_scores_pix2pix = []
@@ -136,26 +141,77 @@ def evaluate_folder_ssim(folder_path,
     for i in range(len(real_images)):
         image_number = real_images[i].split('_')[0]
 
-        ssim_scores_pix2pix.append(ssim_score(os.path.join(folder_path, real_images[i]), 
+        ssim_scores_pix2pix_this_image = []
+        ssim_scores_cycle_this_image = []
+
+        slide_X = 0
+        while slide_X + WINDOW_SIZE[0] < 256:
+            slide_Y = 0
+            while slide_Y + WINDOW_SIZE[1] < 256:
+                ssim_scores_pix2pix_this_image.append(ssim_score(os.path.join(folder_path, real_images[i]), 
                                                     os.path.join(folder_path, pix2pix_images[i]),
                                                     WINDOW_SIZE=WINDOW_SIZE,
+                                                    SLIDE_X=slide_X, SLIDE_Y=slide_Y,
                                                     ALPHA_chosen=ALPHA_chosen, BETA_chosen=BETA_chosen, GAMMA_chosen=GAMMA_chosen,
                                                     plotOn=plotAll,
+                                                    printData=printData,
                                                     image_number=image_number,
-                                                    generation_type='PIX'))
-        ssim_scores_cycle.append(ssim_score(os.path.join(folder_path, real_images[i]),
+                                                    generation_type='PIX')[0])
+                ssim_scores_cycle_this_image.append(ssim_score(os.path.join(folder_path, real_images[i]),
                                                     os.path.join(folder_path, cycle_images[i]),
                                                     WINDOW_SIZE=WINDOW_SIZE,
+                                                    SLIDE_X=slide_X, SLIDE_Y=slide_Y,
                                                     ALPHA_chosen=ALPHA_chosen, BETA_chosen=BETA_chosen, GAMMA_chosen=GAMMA_chosen,
                                                     plotOn=plotAll,
+                                                    printData=printData,
                                                     image_number=image_number,
-                                                    generation_type='CYC'))
+                                                    generation_type='CYC')[0])
+                slide_Y += STRIDE_X
+            slide_X += STRIDE_Y
+
+        if plotSpecial==True:
+            # make the figure large
+            plt.figure(figsize=(20, 5))
+            plt.subplot(1,4,1)
+            plt.imshow(cv2.imread(os.path.join(folder_path, real_images[i])))
+            plt.title('Original X')
+            plt.xticks([]), plt.yticks([])
+
+            plt.subplot(1,4,2)
+            plt.imshow(cv2.imread(os.path.join(folder_path, ground_truth_images[i])))
+            plt.title('True Y')
+            plt.xticks([]), plt.yticks([])
+
+            plt.subplot(1,4,3)
+            plt.imshow(cv2.imread(os.path.join(folder_path, cycle_images[i])))
+            plt.title('CycleGAN Y')
+            plt.xticks([]), plt.yticks([])
+            plt.xlabel(f"SSIM = {np.mean(ssim_scores_cycle_this_image):.2f}")
+
+            plt.subplot(1,4,4)
+            plt.imshow(cv2.imread(os.path.join(folder_path, pix2pix_images[i])))
+            plt.title('pix2pix Y')
+            plt.xticks([]), plt.yticks([])
+            plt.xlabel(f"SSIM = {np.mean(ssim_scores_pix2pix_this_image):.2f}")
+
+            plt.suptitle(f"Image No. {image_number}")
+            plt.show()
+            
+
+        ssim_scores_pix2pix.append(np.mean(ssim_scores_pix2pix_this_image))
+        ssim_scores_cycle.append(np.mean(ssim_scores_cycle_this_image))
+
         
-    if plotScores:
-        plt.plot(ssim_scores_pix2pix, label='pix2pix')
-        plt.plot(ssim_scores_cycle, label='CycleGAN')
+    if plotScores==True:
+        plt.scatter(range(len(ssim_scores_pix2pix)), ssim_scores_pix2pix, label='pix2pix')
+        plt.scatter(range(len(ssim_scores_cycle)), ssim_scores_cycle, label='CycleGAN')
         plt.legend()
+        plt.xlabel('Example Index')
+        plt.ylabel('SSIM Score')
         plt.show()
+        # print Cycle beats Pix2Pix in X% of the cases
+        print(f'CycleGAN beats pix2pix in {np.sum(np.array(ssim_scores_cycle) > np.array(ssim_scores_pix2pix))/len(ssim_scores_pix2pix)*100}% of cases')
+
         
     return ssim_scores_pix2pix, ssim_scores_cycle
 
