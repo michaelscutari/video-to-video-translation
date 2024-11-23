@@ -4,31 +4,29 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from tqdm import tqdm
 from PIL import Image
+from torch.utils.tensorboard import SummaryWriter  # Import SummaryWriter
+import torchvision.utils as vutils  # For image logging
 # custom classes
 from model import GeneratorUNet, DiscriminatorPatchGAN
 from dataset import Pix2PixDataset
 from config import Config
 
+
 # Create necessary directories
 os.makedirs(Config.checkpoint_dir, exist_ok=True)
-os.makedirs(Config.sample_dir, exist_ok=True)
+os.makedirs(Config.log_dir, exist_ok=True)
 
-# Data transformations
-data_transforms = transforms.Compose([
-    transforms.Resize((256, 256)),
-    transforms.RandomHorizontalFlip(),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.5], std=[0.5])
-])
+# tensorboard writer
+writer = SummaryWriter(Config.log_dir)
 
 # Dataset and DataLoader
 train_dataset = Pix2PixDataset(
     input_dir=Config.train_input_dir,
     target_dir=Config.train_target_dir,
-    transform=data_transforms
+    transform=Config.data_transforms
 )
+
 train_loader = DataLoader(
     dataset=train_dataset,
     batch_size=Config.batch_size,
@@ -45,12 +43,16 @@ discriminator = DiscriminatorPatchGAN().to(Config.device)
 def initialize_weights(model):
     for m in model.modules():
         if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
-            nn.init.normal_(m.weight, 0.0, 0.02)
+            if m.weight is not None:
+                nn.init.normal_(m.weight, 0.0, 0.02)
             if m.bias is not None:
                 nn.init.constant_(m.bias, 0)
-        elif isinstance(m, (nn.BatchNorm2d)):
-            nn.init.normal_(m.weight, 1.0, 0.02)
-            nn.init.constant_(m.bias, 0)
+        elif isinstance(m, (nn.InstanceNorm2d)):
+            if m.weight is not None:
+                nn.init.normal_(m.weight, 1.0, 0.02)
+            if m.bias is not None:
+                nn.init.constant_(m.bias, 0)
+
 
 initialize_weights(generator)
 initialize_weights(discriminator)
@@ -77,8 +79,7 @@ for epoch in range(Config.num_epochs):
     generator.train()
     discriminator.train()
     
-    loop = tqdm(train_loader, leave=True)
-    for batch_idx, batch in enumerate(loop):
+    for batch_idx, batch in enumerate(train_loader):
         # Get input and target images
         input_image = batch['input'].to(Config.device)
         target_image = batch['target'].to(Config.device)
@@ -126,40 +127,57 @@ for epoch in range(Config.num_epochs):
         loss_D = (loss_D_real + loss_D_fake) * 0.5
         loss_D.backward()
         optimizer_D.step()
-        
-        # Update progress bar
-        loop.set_description(f"Epoch [{epoch+1}/{Config.num_epochs}]")
-        loop.set_postfix(
-            loss_G=loss_G.item(),
-            loss_D=loss_D.item()
-        )
-    
+
+        # ---------------------
+        #  Logging
+        # ---------------------
+
+        batches_done = epoch * len(train_loader) + batch_idx # total number of batches processed so far
+        if batches_done % 100 == 0:
+            # log scalar metrics
+            writer.add_scalar('Loss/Generator_GAN', loss_GAN.item(), batches_done)
+            writer.add_scalar('Loss/Generator_L1', loss_L1.item(), batches_done)
+            writer.add_scalar('Loss/Generator_Total', loss_G.item(), batches_done)
+            writer.add_scalar('Loss/Discriminator', loss_D.item(), batches_done)
+
+            # log learning rates
+            current_lr_G = optimizer_G.param_groups[0]['lr']
+            current_lr_D = optimizer_D.param_groups[0]['lr']
+            writer.add_scalar('Learning Rate/Generator', current_lr_G, batches_done)
+            writer.add_scalar('Learning Rate/Discriminator', current_lr_D, batches_done)
+
+            # log images
+            with torch.no_grad():
+                generator.eval()
+                fake_sample = generator(fixed_input)
+                
+                # denormalize!
+                def denormalize(tensor):
+                    return tensor * 0.5 + 0.5
+                
+                input_images = denormalize(fixed_input.cpu())
+                target_images = denormalize(fixed_target.cpu())
+                output_images = denormalize(fake_sample.cpu())
+                
+                # Create image grids
+                img_grid_input = vutils.make_grid(input_images, normalize=False)
+                img_grid_target = vutils.make_grid(target_images, normalize=False)
+                img_grid_fake = vutils.make_grid(output_images, normalize=False)
+                
+                # Log images to TensorBoard
+                writer.add_image('Input Images', img_grid_input, batches_done)
+                writer.add_image('Target Images', img_grid_target, batches_done)
+                writer.add_image('Fake Images', img_grid_fake, batches_done)
+                
+                generator.train()
+
     # Update learning rates
     lr_scheduler_G.step()
     lr_scheduler_D.step()
+
     
-        # Save model checkpoints and sample images every 10 epochs
+    # Save model checkpoints every 10 epochs
     if (epoch + 1) % 10 == 0:
         # Save model checkpoints
         torch.save(generator.state_dict(), os.path.join(Config.checkpoint_dir, f'generator_epoch_{epoch+1}.pth'))
         torch.save(discriminator.state_dict(), os.path.join(Config.checkpoint_dir, f'discriminator_epoch_{epoch+1}.pth'))
-        
-        # Save sample outputs from the fixed sample
-        generator.eval()
-        with torch.no_grad():
-            fake_sample = generator(fixed_input)
-            
-            # Denormalize images (assuming normalization was mean=0.5, std=0.5)
-            def denormalize(tensor):
-                return tensor * 0.5 + 0.5
-            
-            input_images = denormalize(fixed_input.cpu())
-            target_images = denormalize(fixed_target.cpu())
-            output_images = denormalize(fake_sample.cpu())
-            
-            # Concatenate images horizontally (input, output, target)
-            combined = torch.cat((input_images[0], output_images[0], target_images[0]), dim=2)  # Concatenate along width
-            
-            # Save the combined image
-            save_path = os.path.join(Config.sample_dir, f'epoch_{epoch+1}_sample.png')
-            transforms.ToPILImage()(combined).save(save_path)
