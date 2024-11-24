@@ -87,9 +87,6 @@ fixed_sample = train_dataset[0]  # Change the index to select a different sample
 fixed_input = fixed_sample['input'].unsqueeze(0).to(Config.device)  # Add batch dimension
 fixed_target = fixed_sample['target'].unsqueeze(0).to(Config.device)  # Add batch dimension
 
-# DEBUG
-print("Starting training...")
-
 # Training loop
 for epoch in range(Config.num_epochs):
     generator.train()
@@ -154,8 +151,6 @@ for epoch in range(Config.num_epochs):
 
         batches_done = epoch * len(train_loader) + batch_idx  # total number of batches processed so far
         if batches_done % 100 == 0:
-            # DEBUG
-            print(f"Logging! Total batches: {batches_done}")
             # Log scalar metrics
             wandb.log({
                 'Loss/Generator_GAN': loss_GAN.item(),

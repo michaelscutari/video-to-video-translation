@@ -1,0 +1,9 @@
+{"time":"2024-11-23T18:57:48.475147012-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-11-23T18:57:48.475191954-05:00","level":"INFO","msg":"created symlink","path":"/home/users/mas296/projects/ece661-GAN-project/pix2pix/wandb/run-20241123_185748-81xuxy8x/logs/debug-core.log"}
+{"time":"2024-11-23T18:57:48.600480075-05:00","level":"INFO","msg":"created new stream","id":"81xuxy8x"}
+{"time":"2024-11-23T18:57:48.600557204-05:00","level":"INFO","msg":"stream: started","id":"81xuxy8x"}
+{"time":"2024-11-23T18:57:48.600623284-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"81xuxy8x"}
+{"time":"2024-11-23T18:57:48.600642728-05:00","level":"INFO","msg":"sender: started","stream_id":"81xuxy8x"}
+{"time":"2024-11-23T18:57:48.600640849-05:00","level":"INFO","msg":"handler: started","stream_id":"81xuxy8x"}
+{"time":"2024-11-23T18:57:49.118611266-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-11-23T18:57:49.122707263-05:00","level":"ERROR","msg":"git repo not found","error":"repository does not exist"}
