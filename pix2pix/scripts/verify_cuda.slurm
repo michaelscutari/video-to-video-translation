@@ -17,28 +17,14 @@ source ~/.bashrc
 # load cuda
 module load cuda/cuda-11.4
 
-# This
 eval "$(micromamba shell hook --shell bash)"
 
 # Activate your micromamba environment
 micromamba activate ece661
 
-# Change to the directory from which the job was submitted
-cd "$SLURM_SUBMIT_DIR"
+lspci | grep -i nvidia
 
-# Create necessary directories to avoid PermissionError
-mkdir -p runs/checkpoints
-mkdir -p runs/logs
-mkdir -p logs
-
-# wandb setup
-export WANDB_API_KEY=2cffe09f8f0eb9f83180bfc498a98e1476803894
-
-# Capture the TensorBoard process ID to terminate it later
-TB_PID=$!
-
-# Run your training script
-python ./src/train.py
-
-# After training completes, kill the TensorBoard process
-kill $TB_PID
+echo "CUDA Available: $(python -c 'import torch; print(torch.cuda.is_available())')"
+echo "Number of CUDA Devices: $(python -c 'import torch; print(torch.cuda.device_count())')"
+echo "Torch Cuda Version: $(python -c 'import torch; print(torch.version.cuda)')"
+nvidia-smi

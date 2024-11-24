@@ -13,6 +13,9 @@ from model import GeneratorUNet, DiscriminatorPatchGAN
 from dataset import Pix2PixDataset
 from config import Config
 
+# Device
+device = torch.device('cuda')
+
 # Initialize Weights & Biases
 wandb.init(
     project="pix2pix-project",  # Replace with your project name
@@ -34,6 +37,7 @@ config = wandb.config
 os.makedirs(Config.checkpoint_dir, exist_ok=True)
 os.makedirs(Config.log_dir, exist_ok=True)  # Optional: You can remove if not needed
 
+
 # Dataset and DataLoader
 train_dataset = Pix2PixDataset(
     input_dir=Config.train_input_dir,
@@ -50,8 +54,8 @@ train_loader = DataLoader(
 )
 
 # Initialize models
-generator = GeneratorUNet().to(Config.device)
-discriminator = DiscriminatorPatchGAN().to(Config.device)
+generator = GeneratorUNet().to(device)
+discriminator = DiscriminatorPatchGAN().to(device)
 
 # Initialize weights
 def initialize_weights(model):
@@ -71,8 +75,8 @@ initialize_weights(generator)
 initialize_weights(discriminator)
 
 # Loss functions
-criterion_GAN = nn.BCEWithLogitsLoss().to(Config.device)
-criterion_L1 = nn.L1Loss().to(Config.device)
+criterion_GAN = nn.BCEWithLogitsLoss().to(device)
+criterion_L1 = nn.L1Loss().to(device)
 
 # Optimizers
 optimizer_G = optim.Adam(generator.parameters(), lr=Config.learning_rate, betas=(Config.beta1, Config.beta2))
@@ -84,25 +88,29 @@ lr_scheduler_D = optim.lr_scheduler.LambdaLR(optimizer_D, lr_lambda=lambda epoch
 
 # Select a fixed sample for consistent monitoring
 fixed_sample = train_dataset[0]  # Change the index to select a different sample
-fixed_input = fixed_sample['input'].unsqueeze(0).to(Config.device)  # Add batch dimension
-fixed_target = fixed_sample['target'].unsqueeze(0).to(Config.device)  # Add batch dimension
+fixed_input = fixed_sample['input'].unsqueeze(0).to(device)  # Add batch dimension
+fixed_target = fixed_sample['target'].unsqueeze(0).to(device)  # Add batch dimension
 
 # DEBUG
 print("Starting training...")
 
 # Training loop
 for epoch in range(Config.num_epochs):
+    
     generator.train()
     discriminator.train()
 
+    print(f"Starting epoch {epoch}/{Config.num_epochs}")
+    print(f"Train loader size: {len(train_loader)}")
     for batch_idx, batch in enumerate(train_loader):
+
         # Get input and target images
-        input_image = batch['input'].to(Config.device)
-        target_image = batch['target'].to(Config.device)
+        input_image = batch['input'].to(device)
+        target_image = batch['target'].to(device)
 
         # Labels for real and fake images
-        real_label = torch.ones((input_image.size(0), 1, 30, 30), device=Config.device)
-        fake_label = torch.zeros((input_image.size(0), 1, 30, 30), device=Config.device)
+        real_label = torch.ones((input_image.size(0), 1, 30, 30), device=device)
+        fake_label = torch.zeros((input_image.size(0), 1, 30, 30), device=device)
 
         # ---------------------
         #  Train Generator
@@ -153,9 +161,9 @@ for epoch in range(Config.num_epochs):
         # ---------------------
 
         batches_done = epoch * len(train_loader) + batch_idx  # total number of batches processed so far
-        if batches_done % 100 == 0:
+        if batches_done % 500 == 0:
             # DEBUG
-            print(f"Logging! Total batches: {batches_done}")
+            print(f"Logging! Total batches: {batches_done}", flush=True)
             # Log scalar metrics
             wandb.log({
                 'Loss/Generator_GAN': loss_GAN.item(),
