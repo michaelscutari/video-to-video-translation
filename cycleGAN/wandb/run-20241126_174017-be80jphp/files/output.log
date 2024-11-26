@@ -1,0 +1,37 @@
+Starting training...
+Traceback (most recent call last):
+  File "/home/users/mas296/projects/ece661-GAN-project/cycleGAN/./src/train.py", line 202, in <module>
+    allegedly_same_Y = gen_X_to_Y(real_y) # G(Y) should remain Y
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/mas296/projects/ece661-GAN-project/cycleGAN/src/model.py", line 75, in forward
+    return self.model(x)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/mas296/projects/ece661-GAN-project/cycleGAN/src/model.py", line 24, in forward
+    return x + self.local_route(x) # x bypasses local_route (residual) to help backpropagation.
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/conv.py", line 554, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/users/mas296/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/conv.py", line 549, in _conv_forward
+    return F.conv2d(
+RuntimeError: Given groups=1, weight of size [512, 512, 3, 3], expected input[16, 256, 66, 66] to have 512 channels, but got 256 channels instead

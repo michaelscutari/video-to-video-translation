@@ -1,0 +1,13 @@
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: michael-scutari (michael-scutari-duke-university). Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.18.7
+wandb: Run data is saved locally in /home/users/mas296/projects/ece661-GAN-project/cycleGAN/wandb/run-20241126_173902-didkq6ou
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run red_delicious
+wandb: ⭐️ View project at https://wandb.ai/michael-scutari-duke-university/cycleGAN-project
+wandb: 🚀 View run at https://wandb.ai/michael-scutari-duke-university/cycleGAN-project/runs/didkq6ou
+Traceback (most recent call last):
+  File "/home/users/mas296/projects/ece661-GAN-project/cycleGAN/./src/train.py", line 42, in <module>
+    train_dataset = CycleGANDataset(
+TypeError: __init__() got an unexpected keyword argument 'input_dir'
+kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]
