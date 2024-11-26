@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "661poet"
+version = "1.8.4"
+description = "bruh"
+authors = ["Peter"]
+license = "idc"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "y"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
