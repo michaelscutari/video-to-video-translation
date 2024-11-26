@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1                      # Number of tasks (typically 1 for a single script)
 #SBATCH --cpus-per-task=4               # Number of CPU cores per task
 #SBATCH --mem=16G                       # Memory per node (adjust as needed)
-#SBATCH --time=12:00:00                 # Time limit hrs:min:sec (8 hours)
+#SBATCH --time=24:00:00                 # Time limit hrs:min:sec (8 hours)
 #SBATCH --gres=gpu:a6000:1               # Request 1 GPU (adjust/remove if not needed)
 #SBATCH --partition=compsci-gpu          # Specify the partition (check with your cluster for available partitions)
 #SBATCH --output=runs/train_output_%j.log   # Standard output log file with Job ID

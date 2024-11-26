@@ -7,6 +7,7 @@ from torchvision import transforms
 from PIL import Image
 import torchvision.utils as vutils  # For image logging
 import wandb  # Import Weights & Biases
+import time
 
 # custom classes
 from model import GeneratorUNet, DiscriminatorPatchGAN
@@ -18,7 +19,7 @@ device = torch.device('cuda')
 
 # Initialize Weights & Biases
 wandb.init(
-    project="pix2pix-project",  # Replace with your project name
+    project="pix2pix-project",
     config={
         "learning_rate": Config.learning_rate,
         "beta1": Config.beta1,
@@ -27,15 +28,14 @@ wandb.init(
         "num_epochs": Config.num_epochs,
         "lambda_L1": Config.lambda_L1,
     },
-    name=f"pix2pix_run_{os.path.basename(__file__)}",  # Optional: Name your run
-    save_code=True  # Optional: Save the code to wandb
+    name=f"parmesan",
+    save_code=False
 )
 
 config = wandb.config
 
 # Create necessary directories
 os.makedirs(Config.checkpoint_dir, exist_ok=True)
-os.makedirs(Config.log_dir, exist_ok=True)  # Optional: You can remove if not needed
 
 
 # Dataset and DataLoader
@@ -56,6 +56,10 @@ train_loader = DataLoader(
 # Initialize models
 generator = GeneratorUNet().to(device)
 discriminator = DiscriminatorPatchGAN().to(device)
+
+# Denormalize!
+def denormalize(tensor):
+    return tensor * 0.5 + 0.5
 
 # Initialize weights
 def initialize_weights(model):
@@ -91,18 +95,36 @@ fixed_sample = train_dataset[0]  # Change the index to select a different sample
 fixed_input = fixed_sample['input'].unsqueeze(0).to(device)  # Add batch dimension
 fixed_target = fixed_sample['target'].unsqueeze(0).to(device)  # Add batch dimension
 
+input_images = denormalize(fixed_input.cpu())
+target_images = denormalize(fixed_target.cpu())
+
+img_grid_input = vutils.make_grid(input_images, normalize=False)
+img_grid_target = vutils.make_grid(target_images, normalize=False)
+
+wandb.log({
+            'Input Images': [wandb.Image(img_grid_input, caption="Input")],
+            'Target Images': [wandb.Image(img_grid_target, caption="Target")],
+        })
+
 # DEBUG
 print("Starting training...")
 
+# timing
+training_start_time = time.time()
+
 # Training loop
-for epoch in range(Config.num_epochs):
+for epoch in range(1, Config.num_epochs + 1):
     
     generator.train()
     discriminator.train()
 
-    print(f"Starting epoch {epoch}/{Config.num_epochs}")
-    print(f"Train loader size: {len(train_loader)}")
+    # Timing
+
+    epoch_start_time = time.time()
+    epoch_batch_times = []
+
     for batch_idx, batch in enumerate(train_loader):
+        batch_start_time = time.time()
 
         # Get input and target images
         input_image = batch['input'].to(device)
@@ -160,6 +182,10 @@ for epoch in range(Config.num_epochs):
         #  Logging
         # ---------------------
 
+        batch_end_time = time.time()
+        batch_time = batch_end_time - batch_start_time
+        epoch_batch_times.append(batch_time)
+
         batches_done = epoch * len(train_loader) + batch_idx  # total number of batches processed so far
         if batches_done % 500 == 0:
             # DEBUG
@@ -172,35 +198,57 @@ for epoch in range(Config.num_epochs):
                 'Loss/Discriminator': loss_D.item(),
                 'Learning Rate/Generator': optimizer_G.param_groups[0]['lr'],
                 'Learning Rate/Discriminator': optimizer_D.param_groups[0]['lr'],
-                'step': batches_done
+                'step': batches_done,
+                'Epoch': epoch,
+                'Batch': batch_idx,
+                'Batch_time': batch_time
             })
 
-            # Log images
-            with torch.no_grad():
-                generator.eval()
-                fake_sample = generator(fixed_input)
+    # ---------------------
+    #  Logging
+    # ---------------------
 
-                # Denormalize!
-                def denormalize(tensor):
-                    return tensor * 0.5 + 0.5
+    # timing
+    epoch_time = time.time() - epoch_start_time
+    average_batch_time = sum(epoch_batch_times) / len(epoch_batch_times)
 
-                input_images = denormalize(fixed_input.cpu())
-                target_images = denormalize(fixed_target.cpu())
-                output_images = denormalize(fake_sample.cpu())
+    # estimated time remaining
+    remaining_epochs = Config.num_epochs - epoch
+    estimated_remaining_time = remaining_epochs * epoch_time
+    time_since_start = time.time() - training_start_time
 
-                # Create image grids
-                img_grid_input = vutils.make_grid(input_images, normalize=False)
-                img_grid_target = vutils.make_grid(target_images, normalize=False)
-                img_grid_fake = vutils.make_grid(output_images, normalize=False)
+    # Log epoch metrics and timing
+    wandb.log({
+        'Epoch': epoch,
+        'Epoch_duration': epoch_time,
+        'Average_batch_time': average_batch_time,
+        'Estimated_remaining_time': estimated_remaining_time,
+        'Time_since_start': time_since_start,
+    })
 
-                # Log images to Weights & Biases
-                wandb.log({
-                    'Input Images': [wandb.Image(img_grid_input, caption="Input")],
-                    'Target Images': [wandb.Image(img_grid_target, caption="Target")],
-                    'Fake Images': [wandb.Image(img_grid_fake, caption="Fake")]
-                })
+    print(f"Epoch {epoch}/{Config.num_epochs} completed in {epoch_time:.2f}s. "
+          f"Average batch time: {average_batch_time:.2f}s. "
+          f"Estimated remaining time: {estimated_remaining_time/60:.2f} minutes."
+          f"Time since start: {time_since_start/60:.2f} minutes", flush=True)
 
-                generator.train()
+    # Log images
+    with torch.no_grad():
+        generator.eval()
+        fake_sample = generator(fixed_input)
+
+        output_images = denormalize(fake_sample.cpu())
+
+        # Create image grids
+        img_grid_fake = vutils.make_grid(output_images, normalize=False)
+
+        # Log images to Weights & Biases
+        wandb.log({
+            'Input Images': [wandb.Image(img_grid_input, caption="Input")],
+            'Target Images': [wandb.Image(img_grid_target, caption="Target")],
+            'Fake Images': [wandb.Image(img_grid_fake, caption="Fake")]
+        })
+
+        generator.train()
 
     # Update learning rates
     lr_scheduler_G.step()

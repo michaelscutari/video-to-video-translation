@@ -18,6 +18,44 @@ def deconv_block(in_channels, out_channels, use_dropout=False):
         layers.append(nn.Dropout(0.5))
     return nn.Sequential(*layers)
 
+# global self-attention
+class self_attention(nn.Module):
+    def __init__(self, in_channels):
+        super(self_attention, self).__init__()
+        # key, query, value
+        self.query = nn.Conv2d(in_channels, in_channels // 8, kernel_size=1)
+        self.key = nn.Conv2d(in_channels, in_channels//8, kernel_size=1)
+        self.value = nn.Conv2d(in_channels, in_channels, kernel_size=1)
+        # scaling param
+        self.gamma = nn.Parameter(torch.zeros(1))
+        # softmax
+        self.softmax = nn.Softmax(dim=-1)
+
+    def forward(self, x):
+        B, C, H, W = x.size()
+
+        # compute query
+        queries = self.query(x).view(B, -1, H*W) # [B, C, H, W] --> [B, C//8, H*W]
+        queries = queries.permute(0, 2, 1) # [B, C//8, H*W] --> [B, H*W, C//8]
+
+        # compute keys
+        keys = self.key(x).view(B, -1, H*W) # [B, C, H, W] --> [B, C//8, H*W]
+
+        # compute attention
+        energy = torch.bmm(queries, keys) # [B, H*W, C//8] x [B, C//8, H*W] --> [B, H*W, H*W]
+        attention = self.softmax(energy / (C//8)**0.5) # attention with scale factor sqrt(dim)
+
+        # compute values
+        values = self.value(x).view(B, -1, H*W) # [B, C, H, W] --> [B, C, H*W]
+
+        # apply attention
+        out = torch.bmm(attention, values.permute(0, 2, 1)) # [B, H*W, H*W] x [B, H*W, C] --> [B, H*W, C]
+        out = out.permute(0, 2, 1) # [B, H*W, C] --> [B, C, H*W]
+        out = out.view(B, C, H, W) # reshape
+
+        # rescale, residule, return
+        return self.gamma * out + x
+
 # model
 class GeneratorUNet(nn.Module):
     """
@@ -34,7 +72,11 @@ class GeneratorUNet(nn.Module):
         self.enc5 = conv_block(512, 512) # (512, 16, 16) -> (512,)
         self.enc6 = conv_block(512, 512) # (512, 8, 8) -> (512,)
         self.enc7 = conv_block(512, 512) # (512, 4, 4) -> (512,)
-        self.enc8 = conv_block(512, 512, use_instancenorm=False) # (512, 2, 2) -> (512,)
+        self.enc8 = conv_block(512, 512, use_instancenorm=False) # (512, 2, 2) -> (512, 1, 1)
+        
+        # self attention
+        self.att1 = self_attention(512) # for enc4
+        self.att2 = self_attention(512) # for enc5
 
         # upsampling path
         self.dec1 = deconv_block(512, 512, use_dropout=True) # no skip connection
@@ -61,6 +103,10 @@ class GeneratorUNet(nn.Module):
         e6 = self.enc6(e5)
         e7 = self.enc7(e6)
         e8 = self.enc8(e7)
+
+        # self-attention
+        e4 = self.att1(e4)
+        e5 = self.att2(e5)
 
         # decoder
         d1 = self.dec1(e8)
