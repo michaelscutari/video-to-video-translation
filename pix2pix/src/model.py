@@ -2,17 +2,17 @@ import torch
 import torch.nn as nn
 
 # one down-sampling conv block
-def conv_block(in_channels, out_channels, use_batchnorm=True):
+def conv_block(in_channels, out_channels, use_instancenorm=True):
     layers = [nn.Conv2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1)]
-    if use_batchnorm:
-        layers.append(nn.BatchNorm2d(out_channels))
+    if use_instancenorm:
+        layers.append(nn.InstanceNorm2d(out_channels))
     layers.append(nn.LeakyReLU(0.2))
     return nn.Sequential(*layers)
 
 # one up-sampling conv block
 def deconv_block(in_channels, out_channels, use_dropout=False):
     layers = [nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1),
-              nn.BatchNorm2d(out_channels),
+              nn.InstanceNorm2d(out_channels),
               nn.ReLU()]
     if use_dropout:
         layers.append(nn.Dropout(0.5))
@@ -27,26 +27,27 @@ class GeneratorUNet(nn.Module):
         super(GeneratorUNet, self).__init__()
 
         # downsampling path
-        self.enc1 = conv_block(input_channels, 64, use_batchnorm=False) # (3, 256, 256) -> (64,)
+        self.enc1 = conv_block(input_channels, 64, use_instancenorm=False) # (3, 256, 256) -> (64,)
         self.enc2 = conv_block(64, 128) # (64, 128, 128) -> (128,)
         self.enc3 = conv_block(128, 256) # (128, 64, 64) -> (256,)
         self.enc4 = conv_block(256, 512) # (256, 32, 32) -> (512,)
         self.enc5 = conv_block(512, 512) # (512, 16, 16) -> (512,)
         self.enc6 = conv_block(512, 512) # (512, 8, 8) -> (512,)
         self.enc7 = conv_block(512, 512) # (512, 4, 4) -> (512,)
-        self.enc8 = conv_block(512, 512, use_batchnorm=False) # (512, 2, 2) -> (512,)
+        self.enc8 = conv_block(512, 512, use_instancenorm=False) # (512, 2, 2) -> (512,)
 
         # upsampling path
         self.dec1 = deconv_block(512, 512, use_dropout=True) # no skip connection
-        self.dec2 = deconv_block(1024, 512, use_dropout=True) # 512 channel skip connection
-        self.dec3 = deconv_block(1024, 512, use_dropout=True) # 512 channel skip
-        self.dec4 = deconv_block(1024, 512) # 512 channel skip
-        self.dec5 = deconv_block(1024, 256) # 512 channel skip
-        self.dec6 = deconv_block(512, 128) # 256 channel skip
-        self.dec7 = deconv_block(256, 64) # 128 channel skip
+        self.dec2 = deconv_block(1024, 512, use_dropout=True) # 512 channel skip with e7
+        self.dec3 = deconv_block(1024, 512, use_dropout=True) # 512 channel skip with e6
+        self.dec4 = deconv_block(1024, 512) # 512 channel skip with e5
+        self.dec5 = deconv_block(1024, 256) # 512 channel skip with e4
+        self.dec6 = deconv_block(512, 128) # 256 channel skip with e3
+        self.dec7 = deconv_block(256, 64) # 128 channel skip with e2
+        self.dec8 = deconv_block(128, 64) # 64 channel skip with e1
         
         # final output layer
-        self.final = nn.ConvTranspose2d(128, output_channels, kernel_size=4, stride=2, padding=1)
+        self.final = nn.ConvTranspose2d(64, output_channels, kernel_size=3, stride=1, padding=1)
         self.tanh = nn.Tanh()
 
     # forward pass
@@ -76,9 +77,10 @@ class GeneratorUNet(nn.Module):
         d6 = torch.cat([d6, e2], dim=1)
         d7 = self.dec7(d6)
         d7 = torch.cat([d7, e1], dim=1)
+        d8 = self.dec8(d7)
 
         # final layer
-        output = self.final(d7)
+        output = self.final(d8)
         output = self.tanh(output)
 
         # return output
@@ -95,15 +97,15 @@ class DiscriminatorPatchGAN(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(64, 128, kernel_size=4, stride=2, padding=1),
-            nn.BatchNorm2d(128),
+            nn.InstanceNorm2d(128),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(128, 256, kernel_size=4, stride=2, padding=1),
-            nn.BatchNorm2d(256),
+            nn.InstanceNorm2d(256),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(256, 512, kernel_size=4, stride=1, padding=1),
-            nn.BatchNorm2d(512),
+            nn.InstanceNorm2d(512),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(512, 1, kernel_size=4, stride=1, padding=1)
