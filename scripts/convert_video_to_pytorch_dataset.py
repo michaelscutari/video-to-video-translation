@@ -55,6 +55,26 @@ class VideoDataset:
     def __del__(self):
         self.cap.release()
 
+    def get_next_frame(self):
+        next_idx = self.current_idx + 1
+        if next_idx >= len(self):
+            raise IndexError("No more frames available")
+        return self[next_idx]
+
+    def get_previous_frame(self):
+        prev_idx = self.current_idx - 1
+        if prev_idx < 0:
+            raise IndexError("No previous frames available")
+        return self[prev_idx]
+
+    def set_current_frame(self, idx):
+        if idx < 0 or idx >= len(self):
+            raise IndexError("Index out of range")
+        self.current_idx = idx
+
+    def get_current_frame(self):
+        return self[self.current_idx]
+
 def main():
     video_path = "videos/horse_square.mp4"
     transform = transforms.Compose([
@@ -64,5 +84,21 @@ def main():
     dataset = VideoDataset(video_path, transform=transform, frame_size=(224, 224), frame_rate=1, resolution=(224, 224))
     print(f"Dataset length: {len(dataset)}")
     print(f"First frame shape: {dataset[0].shape}")
+
+    # Example usage of get_next_frame, get_previous_frame, set_current_frame, and get_current_frame
+    dataset.set_current_frame(2)
+    print(f"Current frame shape: {dataset.get_current_frame().shape}")
+
+    try:
+        next_frame = dataset.get_next_frame()
+        print(f"Next frame shape: {next_frame.shape}")
+    except IndexError as e:
+        print(e)
+
+    try:
+        previous_frame = dataset.get_previous_frame()
+        print(f"Previous frame shape: {previous_frame.shape}")
+    except IndexError as e:
+        print(e)
 
 main()
