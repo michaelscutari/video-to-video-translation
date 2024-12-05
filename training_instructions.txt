@@ -8,3 +8,5 @@ To run the training command: SBATCH train.slurm
 
 CHANGE THE NAME OF THE "APPLE" OR "CHEESE" SO YOU DONT OVERRIDE A PREVIOUS RUN!!!
 This is under src/config.py in either pix2pix or cycleGAN
+
+Keep the API Key the same and just monitor using Michael's W&B page: 
