@@ -2,3 +2,12 @@
 /data
 /pix2pix/data
 /pix2pix/runs
+/pix2pix/wandb
+test.py
+/cycleGAN/data
+/cycleGAN/runs
+/cycleGAN/wandb
+/rerecycleGAN/checkpoints
+/rerecycleGAN/lightning_logs
+/rerecycleGAN/runs
+/rerecycleGAN/wandb

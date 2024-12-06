@@ -1,12 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=train_job            # Job name
-#SBATCH --output=train_output.log       # Standard output log file
-#SBATCH --error=train_error.log         # Standard error log file
+#SBATCH --job-name=cycleGAN             # Job name
 #SBATCH --ntasks=1                      # Number of tasks (typically 1 for a single script)
 #SBATCH --cpus-per-task=4               # Number of CPU cores per task
 #SBATCH --mem=16G                       # Memory per node (adjust as needed)
-#SBATCH --time=24:00:00                 # Time limit hrs:min:sec (8 hours)
-#SBATCH --gres=gpu:a6000:1               # Request 1 GPU (adjust/remove if not needed)
+#SBATCH --time=48:00:00                 # Time limit hrs:min:sec (8 hours)
+#SBATCH --gres=gpu:a5000:1               # Request 1 GPU (adjust/remove if not needed)
 #SBATCH --partition=compsci-gpu          # Specify the partition (check with your cluster for available partitions)
 #SBATCH --output=runs/train_output_%j.log   # Standard output log file with Job ID
 #SBATCH --error=runs/train_error_%j.log     # Standard error log file with Job ID

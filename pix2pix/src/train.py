@@ -19,7 +19,7 @@ device = torch.device('cuda')
 
 # Initialize Weights & Biases
 wandb.init(
-    project="pix2pix-project",
+    project="pix2pix-map2sat",
     config={
         "learning_rate": Config.learning_rate,
         "beta1": Config.beta1,
@@ -28,7 +28,7 @@ wandb.init(
         "num_epochs": Config.num_epochs,
         "lambda_L1": Config.lambda_L1,
     },
-    name=f"parmesan",
+    name=Config.run_name,
     save_code=False
 )
 
@@ -154,9 +154,11 @@ for epoch in range(1, Config.num_epochs + 1):
         # Total generator loss
         loss_G = loss_GAN + loss_L1
         loss_G.backward()
+
+        torch.nn.utils.clip_grad_norm_(generator.parameters(), max_norm=1.0)
+
         optimizer_G.step()
         
-        torch.nn.utils.clip_grad_norm_(generator.parameters(), max_norm=1.0)
 
         # ---------------------
         #  Train Discriminator
@@ -174,9 +176,10 @@ for epoch in range(1, Config.num_epochs + 1):
         # Total discriminator loss
         loss_D = (loss_D_real + loss_D_fake) * 0.5
         loss_D.backward()
-        optimizer_D.step()
 
         torch.nn.utils.clip_grad_norm_(discriminator.parameters(), max_norm=1.0)
+
+        optimizer_D.step()
 
         # ---------------------
         #  Logging
