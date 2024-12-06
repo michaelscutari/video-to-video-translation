@@ -39,14 +39,14 @@ class Config():
     #  WHERE TO SAVE THE MODEL
     #####################################################
     # Paths
-    train_x_dir = './data/train/input'
-    train_y_dir = './data/train/output'
-    val_input_dir = './data/val/input'
-    val_target_dir = './data/val/output'
+    train_x_dir = './data/lionKingData/trainA'
+    train_y_dir = './data/lionKingData/trainB'
+    val_input_dir = './data/lionKingData/testA'
+    val_target_dir = './data/lionKingData/testB'
     # Checkpoint and output directories
-    checkpoint_dir = './runs/red_delicious/checkpoints'
-    sample_dir = './runs/red_delicious/samples'
-    log_dir = './runs/red_delicious/logs'
+    checkpoint_dir = './runs/golden_delicious/checkpoints'
+    sample_dir = './runs/golden_delicious/samples'
+    log_dir = './runs/golden_delicious/logs'
 
     # Data transformations
     data_transforms = transforms.Compose([

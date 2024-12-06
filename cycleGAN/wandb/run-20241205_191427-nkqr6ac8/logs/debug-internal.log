@@ -1,0 +1,16 @@
+{"time":"2024-12-05T19:14:27.791405203-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-12-05T19:14:27.791433065-05:00","level":"INFO","msg":"created symlink","path":"/home/users/zsc5/projects/ece661-GAN-project/cycleGAN/wandb/run-20241205_191427-nkqr6ac8/logs/debug-core.log"}
+{"time":"2024-12-05T19:14:27.909470408-05:00","level":"INFO","msg":"created new stream","id":"nkqr6ac8"}
+{"time":"2024-12-05T19:14:27.909531884-05:00","level":"INFO","msg":"stream: started","id":"nkqr6ac8"}
+{"time":"2024-12-05T19:14:27.909568411-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"nkqr6ac8"}
+{"time":"2024-12-05T19:14:27.909616263-05:00","level":"INFO","msg":"sender: started","stream_id":"nkqr6ac8"}
+{"time":"2024-12-05T19:14:27.909586862-05:00","level":"INFO","msg":"handler: started","stream_id":"nkqr6ac8"}
+{"time":"2024-12-05T19:14:28.126601338-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-05T19:14:30.453897978-05:00","level":"INFO","msg":"stream: closing","id":"nkqr6ac8"}
+{"time":"2024-12-05T19:14:30.453933254-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-05T19:14:30.455279254-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-05T19:14:30.923991921-05:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-12-05T19:14:31.05602564-05:00","level":"INFO","msg":"handler: closed","stream_id":"nkqr6ac8"}
+{"time":"2024-12-05T19:14:31.056068525-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"nkqr6ac8"}
+{"time":"2024-12-05T19:14:31.056098922-05:00","level":"INFO","msg":"sender: closed","stream_id":"nkqr6ac8"}
+{"time":"2024-12-05T19:14:31.056908861-05:00","level":"INFO","msg":"stream: closed","id":"nkqr6ac8"}

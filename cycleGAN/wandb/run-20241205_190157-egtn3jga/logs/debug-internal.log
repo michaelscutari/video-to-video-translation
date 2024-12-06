@@ -1,0 +1,16 @@
+{"time":"2024-12-05T19:01:57.331449063-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2024-12-05T19:01:57.331509568-05:00","level":"INFO","msg":"created symlink","path":"/home/users/zsc5/projects/ece661-GAN-project/cycleGAN/wandb/run-20241205_190157-egtn3jga/logs/debug-core.log"}
+{"time":"2024-12-05T19:01:57.452699208-05:00","level":"INFO","msg":"created new stream","id":"egtn3jga"}
+{"time":"2024-12-05T19:01:57.452782124-05:00","level":"INFO","msg":"stream: started","id":"egtn3jga"}
+{"time":"2024-12-05T19:01:57.4528531-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"egtn3jga"}
+{"time":"2024-12-05T19:01:57.452869437-05:00","level":"INFO","msg":"handler: started","stream_id":"egtn3jga"}
+{"time":"2024-12-05T19:01:57.452854103-05:00","level":"INFO","msg":"sender: started","stream_id":"egtn3jga"}
+{"time":"2024-12-05T19:01:57.709982499-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-05T19:02:00.172435166-05:00","level":"INFO","msg":"stream: closing","id":"egtn3jga"}
+{"time":"2024-12-05T19:02:00.17247347-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-05T19:02:00.173135235-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-05T19:02:00.643796059-05:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-12-05T19:02:00.789889428-05:00","level":"INFO","msg":"handler: closed","stream_id":"egtn3jga"}
+{"time":"2024-12-05T19:02:00.789946787-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"egtn3jga"}
+{"time":"2024-12-05T19:02:00.789961011-05:00","level":"INFO","msg":"sender: closed","stream_id":"egtn3jga"}
+{"time":"2024-12-05T19:02:00.790818525-05:00","level":"INFO","msg":"stream: closed","id":"egtn3jga"}

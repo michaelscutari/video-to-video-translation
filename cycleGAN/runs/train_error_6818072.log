@@ -1,0 +1,47 @@
+/var/lib/slurm/slurmd/job6818072/slurm_script: line 21: micromamba: command not found
+/var/lib/slurm/slurmd/job6818072/slurm_script: line 24: micromamba: command not found
+wandb: Using wandb-core as the SDK backend.  Please refer to https://wandb.me/wandb-core for more information.
+wandb: Currently logged in as: michael-scutari (michael-scutari-duke-university). Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.18.7
+wandb: Run data is saved locally in /home/users/zsc5/projects/ece661-GAN-project/cycleGAN/wandb/run-20241205_191427-nkqr6ac8
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run golden_delicious
+wandb: ⭐️ View project at https://wandb.ai/michael-scutari-duke-university/cycleGAN-project
+wandb: 🚀 View run at https://wandb.ai/michael-scutari-duke-university/cycleGAN-project/runs/nkqr6ac8
+Traceback (most recent call last):
+  File "/home/users/zsc5/projects/ece661-GAN-project/cycleGAN/./src/train.py", line 216, in <module>
+    fake_y = gen_X_to_Y(real_x)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/zsc5/projects/ece661-GAN-project/cycleGAN/src/model.py", line 75, in forward
+    return self.model(x)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/zsc5/projects/ece661-GAN-project/cycleGAN/src/model.py", line 24, in forward
+    return x + self.local_route(x) # x bypasses local_route (residual) to help backpropagation.
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/conv.py", line 554, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/users/zsc5/micromamba/envs/ece661/lib/python3.9/site-packages/torch/nn/modules/conv.py", line 549, in _conv_forward
+    return F.conv2d(
+RuntimeError: Given groups=1, weight of size [512, 512, 3, 3], expected input[16, 256, 66, 66] to have 512 channels, but got 256 channels instead
+kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]

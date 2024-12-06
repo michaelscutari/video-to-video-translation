@@ -1,0 +1,4 @@
+/var/lib/slurm/slurmd/job6819211/slurm_script: line 21: micromamba: command not found
+/var/lib/slurm/slurmd/job6819211/slurm_script: line 24: micromamba: command not found
+/var/lib/slurm/slurmd/job6819211/slurm_script: line 36: python: command not found
+kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]

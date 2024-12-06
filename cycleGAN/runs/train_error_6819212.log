@@ -1,0 +1,7 @@
+/var/lib/slurm/slurmd/job6819212/slurm_script: line 21: micromamba: command not found
+/var/lib/slurm/slurmd/job6819212/slurm_script: line 24: micromamba: command not found
+  File "/home/users/zsc5/projects/ece661-GAN-project/cycleGAN/./src/train.py", line 203
+    iden_loss_XY = criterion_identity(allegedly_same_Y, real_y)
+                                                               ^
+IndentationError: unindent does not match any outer indentation level
+kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]
