@@ -2,22 +2,22 @@ import torch
 from torchvision import transforms
 
 class Config:
+    # NAME OF RUN (CHANGE FOR EVERY RUN)
+    run_name = 'cheddar'
     # Training parameters
     num_epochs = 200
-    batch_size = 16
+    batch_size = 4
     learning_rate = 0.0002
     beta1 = 0.5
     beta2 = 0.999
-    lambda_L1 = 100  # Weight for L1 loss component
+    lambda_L1 = 10  # Weight for L1 loss component
     # Paths
-    train_input_dir = './data/train/input'
-    train_target_dir = './data/train/output'
-    val_input_dir = './data/val/input'
-    val_target_dir = './data/val/output'
+    train_input_dir = './data/sat2map/map'
+    train_target_dir = './data/sat2map/sat'
     # Checkpoint and output directories
-    checkpoint_dir = './runs/run6/checkpoints'
-    sample_dir = './runs/run6/samples'
-    log_dir = './runs/run6/logs'
+    checkpoint_dir = './runs/' + run_name + '/checkpoints'
+    sample_dir = './runs/' + run_name + '/samples'
+    log_dir = './runs/' + run_name + '/logs'
 
     # Data transformations
     data_transforms = transforms.Compose([

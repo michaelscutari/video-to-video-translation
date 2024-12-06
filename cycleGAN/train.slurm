@@ -1,7 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=train_job            # Job name
-#SBATCH --output=train_output.log       # Standard output log file
-#SBATCH --error=train_error.log         # Standard error log file
+#SBATCH --job-name=cycleGAN             # Job name
 #SBATCH --ntasks=1                      # Number of tasks (typically 1 for a single script)
 #SBATCH --cpus-per-task=4               # Number of CPU cores per task
 #SBATCH --mem=16G                       # Memory per node (adjust as needed)

@@ -4,11 +4,11 @@ from PIL import Image
 
 # original data path
 # original_data_path = "/home/users/mas296/.cache/kagglehub/datasets/vikramtiwari/pix2pix-dataset/versions/2/cityscapes/cityscapes/"
-original_data_path = "/home/users/mas296/.cache/kagglehub/datasets/vikramtiwari/pix2pix-dataset/versions/2/edges2shoes/edges2shoes/"
-output_data_path = "../data"
+original_data_path = "../data/sat2map"
+output_data_path = "../data/sat2map_preprocessed"
 
 # subdirectories
-subdirectories = ["train", "val"]
+subdirectories = [""]
 
 # loop
 for subdir in subdirectories:
@@ -19,8 +19,6 @@ for subdir in subdirectories:
     input_img_dir = os.path.join(output_dir, "input")
     output_img_dir = os.path.join(output_dir, "output")
     # delete old preprocessing
-    if os.path.exists(input_img_dir):
-        shutil.rmtree(input_img_dir)
     if os.path.exists(output_img_dir):
         shutil.rmtree(output_img_dir)
     # make new dirs

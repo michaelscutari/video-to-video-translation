@@ -2,6 +2,7 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from PIL import Image
@@ -53,6 +54,9 @@ train_loader = DataLoader(
     drop_last=True
 )
 
+# calculate number of batches
+total_steps = Config.num_epochs * len(train_loader)
+
 # Initialize models
 gen_X_to_Y = Generator().to(device)
 gen_Y_to_X = Generator().to(device)
@@ -98,22 +102,12 @@ optimizer_gen_YX = optim.Adam(gen_Y_to_X.parameters(), lr=Config.lr, betas=(Conf
 optimizer_discr_X = optim.Adam(discr_X.parameters(), lr=Config.lr, betas=(Config.b1, Config.b2))
 optimizer_discr_Y = optim.Adam(discr_Y.parameters(), lr=Config.lr, betas=(Config.b1, Config.b2))
 
-class LambdaLR():
-    def __init__(self, num_epochs, offset, decay_start_epoch):
-        assert ((num_epochs - decay_start_epoch) > 0), "Decay must start before the training session ends!"
-        self.num_epochs = num_epochs
-        self.offset = offset
-        self.decay_start_epoch = decay_start_epoch
-    def step(self, epoch):
-        # learning rate linearly decays from 1 to 0 after the decay starts
-        return 1.0 - max(0, epoch + self.offset - self.decay_start_epoch) / (self.num_epochs - self.decay_start_epoch)
+# one cycle learning rate scheduler for warmup and annealing
+lr_scheduler_gen_XY = OneCycleLR(optimizer_gen_XY, max_lr=Config.lr, total_steps=total_steps)
+lr_scheduler_gen_YX = OneCycleLR(optimizer_gen_YX, max_lr=Config.lr, total_steps=total_steps)
 
-lr_scheduler_gen_XY = optim.lr_scheduler.LambdaLR(optimizer_gen_XY, lr_lambda=LambdaLR(Config.num_epochs, Config.epoch, Config.decay_epoch).step)
-lr_scheduler_gen_YX = optim.lr_scheduler.LambdaLR(optimizer_gen_YX, lr_lambda=LambdaLR(Config.num_epochs, Config.epoch, Config.decay_epoch).step)
-
-lr_scheduler_discr_X = optim.lr_scheduler.LambdaLR(optimizer_discr_X, lr_lambda=LambdaLR(Config.num_epochs, Config.epoch, Config.decay_epoch).step)
-lr_scheduler_discr_Y = optim.lr_scheduler.LambdaLR(optimizer_discr_Y, lr_lambda=LambdaLR(Config.num_epochs, Config.epoch, Config.decay_epoch).step)
-
+lr_scheduler_discr_X = OneCycleLR(optimizer_discr_X, max_lr=Config.lr, total_steps=total_steps)
+lr_scheduler_discr_Y = OneCycleLR(optimizer_discr_Y, max_lr=Config.lr, total_steps=total_steps)
 # Replay buffer
 class ReplayBuffer():
     def __init__(self, max_size=50):
@@ -162,8 +156,12 @@ print("Starting training...")
 # timing
 training_start_time = time.time()
 
+
+
 # Training loop
 for epoch in range(1, Config.num_epochs + 1):
+
+    print(f"Starting epoch {epoch}")
     
     gen_X_to_Y.train()
     gen_Y_to_X.train()
@@ -174,6 +172,24 @@ for epoch in range(1, Config.num_epochs + 1):
 
     epoch_start_time = time.time()
     epoch_batch_times = []
+
+    # Initialize accumulators for epoch-level metrics
+    epoch_metrics = {
+        'Generator/Loss/Identity_XY': 0.0,
+        'Generator/Loss/Identity_YX': 0.0,
+        'Generator/Loss/GAN_XY': 0.0,
+        'Generator/Loss/GAN_YX': 0.0,
+        'Generator/Loss/Cycle_X': 0.0,
+        'Generator/Loss/Cycle_Y': 0.0,
+        'Generator/Loss/Total_XY': 0.0,
+        'Generator/Loss/Total_YX': 0.0,
+        'Discriminator/Loss/Fake_X': 0.0,
+        'Discriminator/Loss/Fake_Y': 0.0,
+        'Discriminator/Loss/Real_X': 0.0,
+        'Discriminator/Loss/Real_Y': 0.0,
+        'Discriminator/Loss/Total_X': 0.0,
+        'Discriminator/Loss/Total_Y': 0.0,
+    }
 
     for batch_idx, batch in enumerate(train_loader):
         batch_start_time = time.time()
@@ -205,8 +221,8 @@ for epoch in range(1, Config.num_epochs + 1):
             allegedly_same_X = gen_Y_to_X(real_x) # G(X) should remain X
             iden_loss_YX = criterion_identity(allegedly_same_X, real_x)
         else:
-            iden_loss_XY = 0
-            iden_loss_YX = 0
+            iden_loss_XY = torch.tensor(0.0, device=device)
+            iden_loss_YX = torch.tensor(0.0, device=device)
 
         # --------
         # Generator adversarial loss
@@ -224,8 +240,8 @@ for epoch in range(1, Config.num_epochs + 1):
             adv_loss_XY = criterion_GAN(pred_fake_Y, real_label)
             adv_loss_YX = criterion_GAN(pred_fake_X, real_label)
         else:
-            adv_loss_XY = 0
-            adv_loss_YX = 0
+            adv_loss_XY = torch.tensor(0.0, device=device)
+            adv_loss_YX = torch.tensor(0.0, device=device)
 
         # --------
         # Cycle loss
@@ -235,6 +251,9 @@ for epoch in range(1, Config.num_epochs + 1):
             cycle_loss_X = criterion_cycle(real_x, allegedly_reconstructed_x)
             allegedly_reconstructed_y = gen_X_to_Y(fake_x)
             cycle_loss_Y = criterion_cycle(real_y, allegedly_reconstructed_y)
+        else:
+            cycle_loss_X = torch.tensor(0.0, device=device)
+            cycle_loss_Y = torch.tensor(0.0, device=device)
 
         # Corrected total generator loss
         tot_loss_XY = (Config.IDENTITY_WEIGHT * iden_loss_XY +
@@ -261,8 +280,8 @@ for epoch in range(1, Config.num_epochs + 1):
         optimizer_discr_Y.zero_grad()
 
         # choose fake images to compare from replay buffer
-        fake_x = fake_X_buffer.push_and_pop(fake_x)
-        fake_y = fake_Y_buffer.push_and_pop(fake_y)
+        fake_x = fake_X_buffer.push_and_pop(fake_x.detach())
+        fake_y = fake_Y_buffer.push_and_pop(fake_y.detach())
 
         # Real images
         pred_real_X = discr_X(real_x)
@@ -291,51 +310,41 @@ for epoch in range(1, Config.num_epochs + 1):
         optimizer_discr_X.step()
         optimizer_discr_Y.step()
 
+        lr_scheduler_gen_XY.step()
+        lr_scheduler_gen_YX.step()
+        lr_scheduler_discr_X.step()
+        lr_scheduler_discr_Y.step()
+
         # ---------------------
         #  Logging
         # ---------------------
+
+        epoch_metrics['Generator/Loss/Identity_XY'] += iden_loss_XY.item()
+        epoch_metrics['Generator/Loss/Identity_YX'] += iden_loss_YX.item()
+        epoch_metrics['Generator/Loss/GAN_XY'] += adv_loss_XY.item()
+        epoch_metrics['Generator/Loss/GAN_YX'] += adv_loss_YX.item()
+        epoch_metrics['Generator/Loss/Cycle_X'] += cycle_loss_X.item()
+        epoch_metrics['Generator/Loss/Cycle_Y'] += cycle_loss_Y.item()
+        epoch_metrics['Generator/Loss/Total_XY'] += tot_loss_XY.item()
+        epoch_metrics['Generator/Loss/Total_YX'] += tot_loss_YX.item()
+        epoch_metrics['Discriminator/Loss/Fake_X'] += discr_loss_fake_X.item()
+        epoch_metrics['Discriminator/Loss/Fake_Y'] += discr_loss_fake_Y.item()
+        epoch_metrics['Discriminator/Loss/Real_X'] += discr_loss_real_X.item()
+        epoch_metrics['Discriminator/Loss/Real_Y'] += discr_loss_real_Y.item()
+        epoch_metrics['Discriminator/Loss/Total_X'] += discr_loss_X.item()
+        epoch_metrics['Discriminator/Loss/Total_Y'] += discr_loss_Y.item()
 
         batch_end_time = time.time()
         batch_time = batch_end_time - batch_start_time
         epoch_batch_times.append(batch_time)
 
-        batches_done = epoch * len(train_loader) + batch_idx  # total number of batches processed so far
-        if batches_done % 500 == 0:
-            # DEBUG
-            print(f"Logging! Total batches: {batches_done}", flush=True)
-            # Log scalar metrics
-            wandb.log({
-                'Loss/Identity_XY': iden_loss_XY.item(),
-                'Loss/Identity_YX': iden_loss_YX.item(),
-                'Loss/GAN_XY': adv_loss_XY.item(),
-                'Loss/GAN_YX': adv_loss_YX.item(),
-                'Loss/Cycle_X': cycle_loss_X.item(),
-                'Loss/Cycle_Y': cycle_loss_Y.item(),
-
-                'Loss/Tot_XY': tot_loss_XY.item(),
-                'Loss/Tot_YX': tot_loss_YX.item(),
-
-                'Loss/Discr_fake_X': discr_loss_fake_X.item(),
-                'Loss/Discr_fake_Y': discr_loss_fake_Y.item(),
-                'Loss/Discr_real_X': discr_loss_real_X.item(),
-                'Loss/Discr_real_Y': discr_loss_real_Y.item(),
-
-                'Loss/Discr_Tot_X': discr_loss_X.item(),
-                'Loss/Discr_Tot_Y': discr_loss_Y.item(),
-
-                'Learning Rate/Gen_XY': optimizer_gen_XY.param_groups[0]['lr'],
-                'Learning Rate/Gen_YX': optimizer_gen_YX.param_groups[0]['lr'],
-
-                'Learning Rate/Discr_X': optimizer_discr_X.param_groups[0]['lr'],
-                'Learning Rate/Discr_Y': optimizer_discr_Y.param_groups[0]['lr'],
-                'Epoch': epoch,
-                'Batch': batch_idx,
-                'Batch_time': batch_time
-            })
-
     # ---------------------
     #  Logging
     # ---------------------
+
+    # Average metrics over epoch
+    for key in epoch_metrics:
+        epoch_metrics[key] /= len(train_loader)
 
     # timing
     epoch_time = time.time() - epoch_start_time
@@ -353,7 +362,13 @@ for epoch in range(1, Config.num_epochs + 1):
         'Average_batch_time': average_batch_time,
         'Estimated_remaining_time': estimated_remaining_time,
         'Time_since_start': time_since_start,
-    })
+        **epoch_metrics,
+        'Learning Rate/Gen_XY': optimizer_gen_XY.param_groups[0]['lr'],
+        'Learning Rate/Gen_YX': optimizer_gen_YX.param_groups[0]['lr'],
+        'Learning Rate/Discr_X': optimizer_discr_X.param_groups[0]['lr'],
+        'Learning Rate/Discr_Y': optimizer_discr_Y.param_groups[0]['lr'],
+    }, step=epoch)
+
 
     print(f"Epoch {epoch}/{Config.num_epochs} completed in {epoch_time:.2f}s. "
           f"Average batch time: {average_batch_time:.2f}s. "
@@ -375,20 +390,24 @@ for epoch in range(1, Config.num_epochs + 1):
         img_grid_fake_X = vutils.make_grid(output_X, normalize=False)
         img_grid_fake_Y = vutils.make_grid(output_Y, normalize=False)
 
-        # Log images to Weights & Biases
+        # Create a comparison grid: Input X, Fake Y, and Target Y
+        comparison_Y = torch.cat([denormalize(fixed_X.cpu()), output_Y], dim=0)
+        img_grid_comparison_Y = vutils.make_grid(comparison_Y, nrow=2, normalize=False)
+
+        # Create a comparison grid: Input Y, Fake X, and Target X
+        comparison_X = torch.cat([denormalize(fixed_Y.cpu()), output_X], dim=0)
+        img_grid_comparison_X = vutils.make_grid(comparison_X, nrow=2, normalize=False)
+
+        # Log comparison images with captions
         wandb.log({
-            'Fake X': [wandb.Image(img_grid_fake_X, caption="Fake X")],
-            'Fake Y': [wandb.Image(img_grid_fake_Y, caption="Fake Y")]
-        })
+            'Generated Images/Y': [wandb.Image(img_grid_fake_Y, caption="Generated Y")],
+            'Generated Images/X': [wandb.Image(img_grid_fake_X, caption="Generated X")],
+            'Comparison/Y': [wandb.Image(img_grid_comparison_Y, caption="Input X and Generated Y")],
+            'Comparison/X': [wandb.Image(img_grid_comparison_X, caption="Input Y and Generated X")],
+        }, step=epoch)
 
         gen_X_to_Y.train()
         gen_Y_to_X.train()
-
-    # Update learning rates
-    lr_scheduler_discr_X.step()
-    lr_scheduler_discr_Y.step()
-    lr_scheduler_gen_XY.step()
-    lr_scheduler_gen_YX.step()
     
 
     # Save model checkpoints every 10 epochs
