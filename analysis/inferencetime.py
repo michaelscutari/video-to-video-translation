@@ -22,24 +22,21 @@ from rerecycleGAN.generators import ResNet as GEN_rerecycle_ResNet # goes X1->X2
 run = wandb.init()
 
 # HOW TO USE <------------------  <------------------  <------------------
-# To edit which model you want to test, open wandb in browser & navigate to the model you want to test.
-# set run_path to the URL in the browser (cut off the "wandb.ai/" part & keep the rest)
-# set the model_file to the name of the model file you want to test
+# Download your desired model & put it into the "/analysis/models" folder.
 
-
-# pull in X->Y & X1->X2 models # TODO: i cant figure out the right path to use.
-PTH_pix2pix_UNet = wandb.restore("generator_epoch_100.pth", run_path="michael-scutari-duke-university/pix2pix-map2sat/runs/jwo7nugf")
-PTH_cycle_UNet = wandb.restore("gen_X_to_Y_epoch_100.pth", run_path="michael-scutari-duke-university/cycleGAN-project/runs/k68exw99")
-# PTH_rerecycle_UNet = wandb.restore("", run_path="")   
-# PTH_rerecycle_ResNet = wandb.restore("", run_path="")   # TODO: Uncomment when ReReCycleGAN is ready.
+# Load a PTH file from my /models folder into torch 
+PTH_pix2pix_UNet = torch.load("analysis/models/generator_epoch_130.pth", map_location=torch.device('cpu'))
+PTH_cycle_UNet = torch.load("analysis/models/gen_X_to_Y_epoch_200.pth", map_location=torch.device('cpu'))
+# PTH_rerecycle_UNet = torch.load("models/")
+# PTH_rerecycle_ResNet = torch.load("models/")
 
 # load the best_model into an instance of GEN_pix2pix_UNet
 model_pix2pix_UNet = GEN_pix2pix_UNet().to(device)
-model_pix2pix_UNet.load_state_dict(torch.load(PTH_pix2pix_UNet.name))
+model_pix2pix_UNet.load_state_dict(PTH_pix2pix_UNet)
 model_pix2pix_UNet.eval()
 
 model_cycle_UNet = GEN_cycle_UNet().to(device)
-model_cycle_UNet.load_state_dict(torch.load(PTH_cycle_UNet.name), device=device)
+model_cycle_UNet.load_state_dict(PTH_cycle_UNet)
 model_cycle_UNet.eval()
 
 # model_rerecycle_UNet = GEN_rerecycle_UNet().to(device)  # TODO: Uncomment when ReReCycleGAN is ready.
@@ -55,7 +52,7 @@ model_cycle_UNet.eval()
 #### Bring in the Image to test the Model
 
 # Load and preprocess the image                     # TODO: may need to delete "analysis" here.
-image_path = os.path.join(os.path.dirname(__file__), 'analysis', 'data', 'frame_0_real.png')
+image_path = 'analysis/data/frame_0_real.png'
 image = Image.open(image_path).convert('RGB')
 transform = transforms.Compose([
     transforms.Resize((256, 256)),

@@ -1,0 +1,16 @@
+{"time":"2024-12-07T12:59:30.756323-05:00","level":"INFO","msg":"using version","core version":"0.19.0"}
+{"time":"2024-12-07T12:59:30.75637-05:00","level":"INFO","msg":"created symlink","path":"/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/wandb/run-20241207_125930-wvgsnbcj/logs/debug-core.log"}
+{"time":"2024-12-07T12:59:30.867517-05:00","level":"INFO","msg":"created new stream","id":"wvgsnbcj"}
+{"time":"2024-12-07T12:59:30.867757-05:00","level":"INFO","msg":"stream: started","id":"wvgsnbcj"}
+{"time":"2024-12-07T12:59:30.867931-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"wvgsnbcj"}
+{"time":"2024-12-07T12:59:30.867941-05:00","level":"INFO","msg":"sender: started","stream_id":"wvgsnbcj"}
+{"time":"2024-12-07T12:59:30.867989-05:00","level":"INFO","msg":"handler: started","stream_id":"wvgsnbcj"}
+{"time":"2024-12-07T12:59:31.103931-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-07T12:59:31.847317-05:00","level":"INFO","msg":"stream: closing","id":"wvgsnbcj"}
+{"time":"2024-12-07T12:59:31.847617-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-07T12:59:31.849167-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-07T12:59:32.18722-05:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-12-07T12:59:32.312453-05:00","level":"INFO","msg":"handler: closed","stream_id":"wvgsnbcj"}
+{"time":"2024-12-07T12:59:32.312464-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"wvgsnbcj"}
+{"time":"2024-12-07T12:59:32.312474-05:00","level":"INFO","msg":"sender: closed","stream_id":"wvgsnbcj"}
+{"time":"2024-12-07T12:59:32.312626-05:00","level":"INFO","msg":"stream: closed","id":"wvgsnbcj"}

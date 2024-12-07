@@ -11,3 +11,4 @@ test.py
 /rerecycleGAN/lightning_logs
 /rerecycleGAN/runs
 /rerecycleGAN/wandb
+/analysis/models

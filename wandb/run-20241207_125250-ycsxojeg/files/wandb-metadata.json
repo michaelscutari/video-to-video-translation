@@ -1,0 +1,17 @@
+{
+  "os": "macOS-15.0.1-arm64-arm-64bit",
+  "python": "CPython 3.10.5",
+  "startedAt": "2024-12-07T17:52:50.263524Z",
+  "program": "/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/inferencetime.py",
+  "codePath": "analysis/inferencetime.py",
+  "git": {
+    "remote": "https://github.com/ArtfulMumbles/ece661-GAN-project.git",
+    "commit": "196ea8798f4c7c88bfdc685e23e27716af2652e0"
+  },
+  "email": "michael.scutari@duke.edu",
+  "root": "/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project",
+  "host": "Peters-MacBook-Pro-77.local",
+  "username": "peterbanyas",
+  "executable": "/usr/local/bin/python3",
+  "codePathLocal": "analysis/inferencetime.py"
+}
