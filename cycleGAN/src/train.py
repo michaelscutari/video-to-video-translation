@@ -215,7 +215,7 @@ for epoch in range(1, Config.num_epochs + 1):
         #  Identity Loss (g_xy(y) = y ?)
         # --------
         if Config.IDENTITY_LOSS_INCLUDED == True:
-             gedly_same_Y = gen_X_to_Y(real_y) # G(Y) should remain Y
+            allegedly_same_Y = gen_X_to_Y(real_y) # G(Y) should remain Y
             iden_loss_XY = criterion_identity(allegedly_same_Y, real_y)
 
             allegedly_same_X = gen_Y_to_X(real_x) # G(X) should remain X
