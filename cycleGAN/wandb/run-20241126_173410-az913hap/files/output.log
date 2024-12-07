@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/home/users/mas296/projects/ece661-GAN-project/cycleGAN/./src/train.py", line 42, in <module>
-    train_dataset = ImageDataset(
-TypeError: __init__() got an unexpected keyword argument 'input_dir'

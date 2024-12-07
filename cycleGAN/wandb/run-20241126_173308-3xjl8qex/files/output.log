@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/home/users/mas296/projects/ece661-GAN-project/cycleGAN/./src/train.py", line 38, in <module>
-    os.makedirs(Config.checkpoint_dir, exist_ok=True)
-AttributeError: type object 'Config' has no attribute 'checkpoint_dir'
