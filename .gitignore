@@ -12,3 +12,7 @@ test.py
 /rerecycleGAN/runs
 /rerecycleGAN/wandb
 /analysis/models
+/analysis/data
+/analysis/output
+/analysis/merged
+/scripts/videos
