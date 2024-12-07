@@ -1,0 +1,30 @@
+[34m[1mwandb[0m: [32m[41mERROR[0m Could not find run <Run michael-scutari-duke-university/pix2pix-map2sat/checkpoints (not found)>
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/apis/normalize.py", line 25, in wrapper
+    return func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/apis/public/api.py", line 987, in run
+    self._runs[path] = public.Run(self.client, entity, project, run_id)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/apis/public/runs.py", line 332, in __init__
+    self.load(force=not _attrs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/apis/public/runs.py", line 435, in load
+    raise ValueError("Could not find run {}".format(self))
+ValueError: Could not find run <Run michael-scutari-duke-university/pix2pix-map2sat/checkpoints (not found)>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/inferencetime.py", line 30, in <module>
+    PTH_pix2pix_UNet = wandb.restore("generator_epoch_100.pth", run_path="michael-scutari-duke-university/pix2pix-map2sat/runs/jwo7nugf/files/runs/gouda/checkpoints")
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 4080, in restore
+    api_run = api.run(run_path)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/apis/normalize.py", line 71, in wrapper
+    raise CommError(message, err).with_traceback(sys.exc_info()[2])
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/apis/normalize.py", line 25, in wrapper
+    return func(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/apis/public/api.py", line 987, in run
+    self._runs[path] = public.Run(self.client, entity, project, run_id)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/apis/public/runs.py", line 332, in __init__
+    self.load(force=not _attrs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/wandb/apis/public/runs.py", line 435, in load
+    raise ValueError("Could not find run {}".format(self))
+wandb.errors.errors.CommError: Could not find run <Run michael-scutari-duke-university/pix2pix-map2sat/checkpoints (not found)>

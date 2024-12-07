@@ -1,7 +1,6 @@
 import torch
 from torchvision import transforms
 from PIL import Image
-from model import Generator
 import wandb
 import matplotlib.pyplot as plt
 import sys
@@ -12,7 +11,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 ################################################
 #### Bring in the Model Architectures for each
-sys.path.append(os.path.abspath('..'))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from pix2pix.src.model import GeneratorUNet as GEN_pix2pix_UNet # goes X->Y or Y->X
 from cycleGAN.src.model import Generator as GEN_cycle_UNet # goes X->Y or Y->X
 from rerecycleGAN.generators import UNet as GEN_rerecycle_UNet # goes X->Y or Y->X
@@ -22,14 +21,15 @@ from rerecycleGAN.generators import ResNet as GEN_rerecycle_ResNet # goes X1->X2
 #### Bring in the Weights & Biases to fill the Architectures for each
 run = wandb.init()
 
-# TODO: HOW TO USE <------------------  <------------------  <------------------
+# HOW TO USE <------------------  <------------------  <------------------
 # To edit which model you want to test, open wandb in browser & navigate to the model you want to test.
 # set run_path to the URL in the browser (cut off the "wandb.ai/" part & keep the rest)
 # set the model_file to the name of the model file you want to test
 
-# pull in X->Y & X1->X2 models
-PTH_pix2pix_UNet = wandb.restore("generator_epoch_100.pth", run_path="michael-scutari-duke-university/pix2pix-map2sat/runs/jwo7nugf/files/runs/gouda/checkpoints")
-PTH_cycle_UNet = wandb.restore("gen_X_to_Y_epoch_100.pth", run_path="michael-scutari-duke-university/cycleGAN-project/runs/k68exw99/files/runs/granny_smith/checkpoints")
+
+# pull in X->Y & X1->X2 models # TODO: i cant figure out the right path to use.
+PTH_pix2pix_UNet = wandb.restore("generator_epoch_100.pth", run_path="michael-scutari-duke-university/pix2pix-map2sat/runs/jwo7nugf")
+PTH_cycle_UNet = wandb.restore("gen_X_to_Y_epoch_100.pth", run_path="michael-scutari-duke-university/cycleGAN-project/runs/k68exw99")
 # PTH_rerecycle_UNet = wandb.restore("", run_path="")   
 # PTH_rerecycle_ResNet = wandb.restore("", run_path="")   # TODO: Uncomment when ReReCycleGAN is ready.
 
