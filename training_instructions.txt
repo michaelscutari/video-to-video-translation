@@ -4,9 +4,11 @@ Alter SBATCH Params to ensure you aren't idling - squeue -u $USER (Command shows
 
 Can change a6000 to a5000 if there isnt a 6000 available
 
-To run the training command: SBATCH train.slurm
+To run the training command: sbatch train.slurm
 
 CHANGE THE NAME OF THE "APPLE" OR "CHEESE" SO YOU DONT OVERRIDE A PREVIOUS RUN!!!
 This is under src/config.py in either pix2pix or cycleGAN
 
 Keep the API Key the same and just monitor using Michael's W&B page: 
+
+To cancel a job SCANCEL [job_id]
