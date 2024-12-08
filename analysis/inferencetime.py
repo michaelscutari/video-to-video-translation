@@ -51,7 +51,7 @@ model_cycle_UNet.eval()
 ################################################
 #### Bring in the Image to test the Model
 
-# Load and preprocess the image                     # TODO: may need to delete "analysis" here.
+# Load and preprocess the image                   .
 image_path = 'analysis/data/frame_0_real.png'
 image = Image.open(image_path).convert('RGB')
 transform = transforms.Compose([

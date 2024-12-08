@@ -4,8 +4,9 @@ from PIL import Image
 
 # original data path
 # original_data_path = "/home/users/mas296/.cache/kagglehub/datasets/vikramtiwari/pix2pix-dataset/versions/2/cityscapes/cityscapes/"
-original_data_path = "../data/sat2map"
-output_data_path = "../data/sat2map_preprocessed"
+# original_data_path = "../data/sat2map"
+original_data_path = "../data/"
+output_data_path = "../data/s_preprocessed"
 
 # subdirectories
 subdirectories = [""]
