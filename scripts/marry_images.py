@@ -2,9 +2,9 @@ import os
 from PIL import Image
 
 # Define directories
-input_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/data/lion_vid_chase/'
-output_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/output/lion_vid_chase/'
-merged_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/merged/lion_vid_chase/'
+input_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/data/mufasa_lost/'
+output_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/output/mufasa_lost/'
+merged_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/merged/mufasa_lost/'
 
 # Create merged directory if it doesn't exist
 os.makedirs(merged_dir, exist_ok=True)

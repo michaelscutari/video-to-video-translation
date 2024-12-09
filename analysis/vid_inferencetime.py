@@ -15,18 +15,18 @@ import os
 #        The frames will be saved in the "/analysis/data/YOUR_TITLE_HERE/" folder.
 
 # Define Directories
-input_dir = 'analysis/data/lion_vid_chase'
-output_dir = 'analysis/output/lion_vid_chase'
+input_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/data/yawn'
+output_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/output/yawn'
 
 pix_model_dir = 'analysis/models/generator_epoch_130.pth'
-cycle_model_dir = 'analysis/models/gen_Y_to_X_epoch_150.pth'
+cycle_model_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/models/gen_Y_to_X_epoch_150.pth'
 rerecycle_UNet_model_dir = ''
 rerecycle_ResNet_model_dir = ''
 
 # which models to use?
 yesPIX2PIX = False
-yesCYCLE = True
-yesRERECYCLE = False
+yesCYCLE = False
+yesRERECYCLE = True
 
 
 # Create output directory if it doesn't exist

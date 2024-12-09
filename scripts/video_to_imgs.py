@@ -7,8 +7,8 @@ import os
 # video_path = 'videos/horse_square.mp4'
 # output_dir = 'keyframes/animation_test/'
 
-video_path = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/scripts/videos/lion_vid_chase.mp4'
-output_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/data/lion_vid_chase/'
+video_path = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/scripts/videos/mufasa_lost.mp4'
+output_dir = '/Users/peterbanyas/Desktop/ECE 661/Project 661/ece661-GAN-project/analysis/data/mufasa_lost/'
 
 image_size = (256, 256)
 
