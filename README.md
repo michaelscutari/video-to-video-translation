@@ -1,2 +1,2 @@
 # ECE661 GAN Project
-Zach Charlick, Add your names
+Zach Charlick, Michael Scutari
