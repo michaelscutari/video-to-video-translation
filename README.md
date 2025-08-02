@@ -6,6 +6,8 @@ A comprehensive implementation of state-of-the-art Generative Adversarial Networ
 
 This project implements and extends several prominent GAN architectures for image-to-image translation, demonstrating proficiency in deep learning research and engineering best practices. The implementation includes CycleGAN for unpaired translation, Pix2Pix for paired translation, and a novel RecycleGAN extension that incorporates temporal consistency for video-based applications.
 
+See the [Final Poster]([url](https://github.com/michaelscutari/video-to-video-translation/blob/main/Final%20Poster.pdf))
+
 ## Architectures Implemented
 
 ### CycleGAN
