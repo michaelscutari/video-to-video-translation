@@ -64,6 +64,6 @@ The implementation successfully demonstrates high-quality image translation acro
 
 ---
 
-**Contributors**: Zach Charlick, Michael Scutari
+**Contributors**: Zach Charlick, Michael Scutari, Peter Banyas
 **Course**: ECE661 - Computer Vision  
 **Institution**: Duke University
